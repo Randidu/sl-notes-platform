@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlmodel import Session, select
-from backend.app.database import create_db_and_tables, get_session
-from backend.app.models import User
-from backend.app.auth_utils import hash_password
+from app.database import create_db_and_tables, get_session
+from app.models import User
+from app.auth_utils import hash_password
+from app.email_utils import send_verification_email
 
 app = FastAPI(title="SL Notes API")
 
@@ -47,3 +48,12 @@ def verify_account(token: str, session: Session = Depends(get_session)):
     session.commit()
     
     return {"message": "Account verified! You can now log in."}
+
+@app.post("/register")
+async def register_user(user_data: User, session: Session = Depends(get_session)):
+    # ... (keep your existing check for existing_user and hashing)
+    
+    # After session.commit(), send the email
+    await send_verification_email(user_data.email, user_data.verification_token)
+    
+    return {"message": "User created! Please check your email to verify."}
