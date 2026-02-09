@@ -1,59 +1,79 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlmodel import Session, select
-from app.database import create_db_and_tables, get_session
-from app.models import User
-from app.auth_utils import hash_password
-from app.email_utils import send_verification_email
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from contextlib import asynccontextmanager
+import os
 
-app = FastAPI(title="SL Notes API")
+from app.database import create_db_and_tables
+from app.config import get_settings
+from app.routers import auth, subjects, notes, search, uploads, admin
 
-@app.on_event("startup")
-def on_startup():
+settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan - runs on startup and shutdown."""
+    # Startup
     create_db_and_tables()
+    
+    # Ensure upload directory exists
+    upload_dir = os.path.join(os.path.dirname(__file__), "uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    yield
+    
+    # Shutdown (cleanup if needed)
+    pass
 
-@app.get("/")
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    description="API for SL Notes - Exam preparation platform for O/L and A/L students in Sri Lanka",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# CORS Configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        settings.FRONTEND_URL,
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount static files for uploads
+upload_dir = os.path.join(os.path.dirname(__file__), "uploads")
+os.makedirs(upload_dir, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=upload_dir), name="uploads")
+
+# Include routers
+app.include_router(auth.router)
+app.include_router(subjects.router)
+app.include_router(notes.router)
+app.include_router(search.router)
+app.include_router(uploads.router)
+app.include_router(admin.router)
+
+
+@app.get("/", tags=["Health"])
 def read_root():
-    return {"message": "Welcome to SL Notes API"}
+    """Health check endpoint."""
+    return {
+        "message": "Welcome to SL Notes API",
+        "version": "1.0.0",
+        "docs": "/docs"
+    }
 
-# Add this below your root route in main.py
-@app.post("/register")
-def register_user(user_data: User, session: Session = Depends(get_session)):
-    # 1. Check if user exists
-    existing_user = session.exec(select(User).where(User.email == user_data.email)).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
 
-    # 2. Hash and Save
-    # Architect's Note: user_data.hashed_password here is the PLAIN text from the user
-    user_data.hashed_password = hash_password(user_data.hashed_password)
-    
-    session.add(user_data)
-    session.commit()
-    session.refresh(user_data)
-    return {"message": "User created successfully", "user_id": user_data.id}
-
-@app.get("/verify/{token}")
-def verify_account(token: str, session: Session = Depends(get_session)):
-    # Find the user with this secret token
-    statement = select(User).where(User.verification_token == token)
-    user = session.exec(statement).first()
-    
-    if not user:
-        raise HTTPException(status_code=404, detail="Invalid verification link")
-    
-    # Unlock the account
-    user.is_verified = True
-    user.verification_token = "" # Clear it so it can't be used again
-    session.add(user)
-    session.commit()
-    
-    return {"message": "Account verified! You can now log in."}
-
-@app.post("/register")
-async def register_user(user_data: User, session: Session = Depends(get_session)):
-    # ... (keep your existing check for existing_user and hashing)
-    
-    # After session.commit(), send the email
-    await send_verification_email(user_data.email, user_data.verification_token)
-    
-    return {"message": "User created! Please check your email to verify."}
+@app.get("/health", tags=["Health"])
+def health_check():
+    """Health check endpoint."""
+    return {"status": "healthy"}
