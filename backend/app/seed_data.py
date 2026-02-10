@@ -61,7 +61,7 @@ def seed_demo_user(session: Session) -> User:
     user = User(
         email="demo@slnotes.lk",
         full_name="Demo User",
-        password_hash=hash_password("demo123"),
+        hashed_password=hash_password("demo123"),
         is_verified=True,
         is_admin=False
     )

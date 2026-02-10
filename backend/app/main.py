@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import os
-
 from app.database import create_db_and_tables
 from app.config import get_settings
 from app.routers import auth, subjects, notes, search, uploads, admin

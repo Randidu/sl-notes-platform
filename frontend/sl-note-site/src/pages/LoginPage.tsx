@@ -147,7 +147,6 @@ const LoginPage: React.FC = () => {
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
-
                         <button type="submit" style={buttonStyle} disabled={loading}>
                             {loading ? 'Signing in...' : 'Sign In'}
                         </button>

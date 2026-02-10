@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, FileText, Eye, Calendar } from 'lucide-react';
+import { ArrowLeft, FileText, Eye, Calendar, Search } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { noteService } from '../services/noteService';
 import { subjectService } from '../services/subjectService';
@@ -9,10 +9,12 @@ import type { Note, Subject } from '../types';
 const NotesPage: React.FC = () => {
     const { subjectId } = useParams<{ subjectId: string }>();
     const [notes, setNotes] = useState<Note[]>([]);
+    const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
     const [subject, setSubject] = useState<Subject | null>(null);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [searchQuery, setSearchQuery] = useState('');
     const { theme } = useTheme();
 
     const isDark = theme === 'dark';
@@ -27,6 +29,7 @@ const NotesPage: React.FC = () => {
                 ]);
                 setSubject(subjectData);
                 setNotes(notesData.notes);
+                setFilteredNotes(notesData.notes);
                 setTotalPages(notesData.pages);
             } catch (error) {
                 console.error('Failed to load data:', error);
@@ -36,6 +39,18 @@ const NotesPage: React.FC = () => {
         };
         loadData();
     }, [subjectId, page]);
+
+    // Filter notes based on search query
+    useEffect(() => {
+        if (searchQuery.trim() === '') {
+            setFilteredNotes(notes);
+        } else {
+            const filtered = notes.filter(note =>
+                note.title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setFilteredNotes(filtered);
+        }
+    }, [searchQuery, notes]);
 
     const cardStyle: React.CSSProperties = {
         backgroundColor: isDark ? '#1f2937' : '#ffffff',
@@ -73,6 +88,56 @@ const NotesPage: React.FC = () => {
                     )}
                 </div>
 
+                {/* Search Bar */}
+                <div style={{ marginBottom: '32px' }}>
+                    <div style={{ position: 'relative', maxWidth: '500px' }}>
+                        <Search style={{
+                            position: 'absolute',
+                            left: '16px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            width: '20px',
+                            height: '20px',
+                            color: isDark ? '#9ca3af' : '#6b7280'
+                        }} />
+                        <input
+                            type="text"
+                            placeholder="Search notes by title..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{
+                                width: '100%',
+                                paddingLeft: '48px',
+                                paddingRight: '16px',
+                                paddingTop: '12px',
+                                paddingBottom: '12px',
+                                border: `1px solid ${isDark ? '#374151' : '#d1d5db'}`,
+                                borderRadius: '12px',
+                                backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                                color: isDark ? '#f9fafb' : '#111827',
+                                outline: 'none',
+                                fontSize: '15px',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={(e) => {
+                                e.currentTarget.style.borderColor = '#3b82f6';
+                            }}
+                            onBlur={(e) => {
+                                e.currentTarget.style.borderColor = isDark ? '#374151' : '#d1d5db';
+                            }}
+                        />
+                    </div>
+                    {searchQuery && (
+                        <p style={{
+                            marginTop: '12px',
+                            fontSize: '14px',
+                            color: isDark ? '#9ca3af' : '#6b7280'
+                        }}>
+                            Found {filteredNotes.length} note{filteredNotes.length !== 1 ? 's' : ''}
+                        </p>
+                    )}
+                </div>
+
                 {/* Notes Grid */}
                 {loading ? (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
@@ -83,7 +148,7 @@ const NotesPage: React.FC = () => {
                 ) : notes.length > 0 ? (
                     <>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-                            {notes.map((note) => (
+                            {filteredNotes.map((note) => (
                                 <Link key={note.id} to={`/notes/${note.id}`} style={{ textDecoration: 'none' }}>
                                     <div style={cardStyle}>
                                         {note.topic && (

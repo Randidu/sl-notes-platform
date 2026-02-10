@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminNavbar from '../../components/admin/AdminNavbar';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Upload } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -58,19 +59,26 @@ const CreateNote: React.FC = () => {
 
             // Upload file first if present
             if (file) {
+                console.log('Uploading file:', file.name);
                 const uploadResult = await noteService.uploadFile(file);
+                console.log('Upload result:', uploadResult);
                 fileUrl = uploadResult.file_url;
+                console.log('File URL:', fileUrl);
             }
 
             // Create note
-            await noteService.create({
+            const noteData = {
                 ...formData,
                 file_url: fileUrl,
-            });
+            };
+            console.log('Creating note with data:', noteData);
+            const createdNote = await noteService.create(noteData);
+            console.log('Created note:', createdNote);
 
             setSuccess('Note created successfully!');
             setTimeout(() => navigate('/admin/notes'), 1500);
         } catch (error: any) {
+            console.error('Error creating note:', error);
             setError(error.response?.data?.detail || 'Failed to create note');
         } finally {
             setLoading(false);
@@ -100,6 +108,7 @@ const CreateNote: React.FC = () => {
     return (
         <div style={{ padding: '32px 0', minHeight: '100vh' }}>
             <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 16px' }}>
+                <AdminNavbar />
                 <Link to="/admin/notes" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#3b82f6', textDecoration: 'none', marginBottom: '24px', fontWeight: 500 }}>
                     <ArrowLeft size={20} /> Back to Notes Management
                 </Link>

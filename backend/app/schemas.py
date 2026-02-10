@@ -24,6 +24,7 @@ class UserResponse(BaseModel):
     full_name: str
     email: str
     is_verified: bool
+    is_admin: bool
     
     class Config:
         from_attributes = True
@@ -85,6 +86,8 @@ class NoteBase(BaseModel):
 class NoteCreate(NoteBase):
     """Schema for creating a note."""
     subject_id: int
+    file_url: Optional[str] = None
+    is_published: bool = True
 
 
 class NoteUpdate(BaseModel):
@@ -92,6 +95,7 @@ class NoteUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     content: Optional[str] = Field(None, min_length=1)
     topic: Optional[str] = Field(None, max_length=100)
+    file_url: Optional[str] = None
     is_published: Optional[bool] = None
 
 

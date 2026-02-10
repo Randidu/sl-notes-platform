@@ -38,6 +38,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     
     to_encode.update({"exp": expire})
+    # Update sub to string if it exists
+    if "sub" in to_encode:
+        to_encode["sub"] = str(to_encode["sub"])
+        
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
@@ -47,7 +51,8 @@ def verify_token(token: str) -> Optional[dict]:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return payload
-    except JWTError:
+    except JWTError as e:
+        print(f"DEBUG: JWT Error: {str(e)}")
         return None
 
 
@@ -64,19 +69,26 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     
-    payload = verify_token(token)
-    if payload is None:
+    try:
+        payload = verify_token(token)
+        if payload is None:
+            print(f"DEBUG: Token verification failed for token: {token[:10]}...")
+            raise credentials_exception
+        
+        user_id: int = payload.get("sub")
+        if user_id is None:
+            print("DEBUG: Token has no sub")
+            raise credentials_exception
+        
+        user = session.get(User, user_id)
+        if user is None:
+            print(f"DEBUG: User not found for id: {user_id}")
+            raise credentials_exception
+        
+        return user
+    except Exception as e:
+        print(f"DEBUG: Exception in get_current_user: {str(e)}")
         raise credentials_exception
-    
-    user_id: int = payload.get("sub")
-    if user_id is None:
-        raise credentials_exception
-    
-    user = session.get(User, user_id)
-    if user is None:
-        raise credentials_exception
-    
-    return user
 
 
 async def get_current_active_user(

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Mail, Phone, MapPin, Heart } from 'lucide-react';
+import { Mail, Phone, MapPin, Heart } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import logo from '../../assets/logo.png';
 
 const Footer: React.FC = () => {
     const { theme } = useTheme();
@@ -20,18 +21,17 @@ const Footer: React.FC = () => {
                     {/* Brand */}
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                            <div style={{
-                                width: '44px',
-                                height: '44px',
-                                background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-                                borderRadius: '12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                                <BookOpen style={{ width: '22px', height: '22px', color: 'white' }} />
-                            </div>
-                            <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'white' }}>SL Notes</span>
+                            <img
+                                src={logo}
+                                alt="SL Notes Logo"
+                                style={{
+                                    width: '44px',
+                                    height: '44px',
+                                    borderRadius: '12px',
+                                    objectFit: 'cover',
+                                }}
+                            />
+                            <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'white' }}>Sl Note Site</span>
                         </div>
                         <p style={{ color: '#9ca3af', lineHeight: 1.7 }}>
                             Comprehensive exam preparation platform for O/L and A/L students in Sri Lanka.

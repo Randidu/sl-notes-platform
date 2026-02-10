@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Calendar, Eye, User, FileText, Download } from 'lucide-react';
+import { ArrowLeft, Calendar, Eye, User, FileText, Download, ExternalLink } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { noteService } from '../services/noteService';
+import { API_BASE_URL } from '../services/api';
 import type { Note } from '../types';
+
+// Helper function to get full file URL
+const getFileUrl = (fileUrl: string | null | undefined): string | null => {
+    if (!fileUrl) return null;
+    // If it's already a full URL, return as is
+    if (fileUrl.startsWith('http')) return fileUrl;
+    // Otherwise, prepend the API base URL
+    return `${API_BASE_URL}${fileUrl}`;
+};
 
 const NoteDetailPage: React.FC = () => {
     const { noteId } = useParams<{ noteId: string }>();
@@ -18,6 +28,8 @@ const NoteDetailPage: React.FC = () => {
             if (!noteId) return;
             try {
                 const data = await noteService.getById(parseInt(noteId));
+                console.log('Note data:', data);
+                console.log('File URL:', data.file_url);
                 setNote(data);
             } catch (error) {
                 console.error('Failed to load note:', error);
@@ -113,41 +125,115 @@ const NoteDetailPage: React.FC = () => {
                         </div>
 
                         {/* Attachment */}
-                        {note.file_url && (
-                            <div style={{
-                                marginTop: '32px',
-                                padding: '20px',
-                                backgroundColor: isDark ? '#374151' : '#f3f4f6',
-                                borderRadius: '12px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    <FileText style={{ width: '24px', height: '24px', color: '#3b82f6' }} />
-                                    <div>
-                                        <p style={{ fontWeight: 500, color: isDark ? '#f9fafb' : '#111827' }}>Attachment</p>
-                                        <p style={{ fontSize: '14px', color: isDark ? '#9ca3af' : '#6b7280' }}>PDF Document</p>
-                                    </div>
+                        {getFileUrl(note.file_url) && (
+                            <div style={{ marginTop: '32px' }}>
+                                {/* Action Buttons */}
+                                <div style={{
+                                    display: 'flex',
+                                    gap: '12px',
+                                    marginBottom: '20px',
+                                    flexWrap: 'wrap',
+                                }}>
+                                    <a
+                                        href={getFileUrl(note.file_url) || '#'}
+                                        download
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            padding: '12px 24px',
+                                            backgroundColor: '#3b82f6',
+                                            color: 'white',
+                                            borderRadius: '12px',
+                                            textDecoration: 'none',
+                                            fontWeight: 600,
+                                            fontSize: '15px',
+                                            transition: 'all 0.2s',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#2563eb';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.4)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#3b82f6';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    >
+                                        <Download size={18} /> Download PDF
+                                    </a>
+                                    <a
+                                        href={getFileUrl(note.file_url) || '#'}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            padding: '12px 24px',
+                                            backgroundColor: isDark ? '#374151' : '#f3f4f6',
+                                            color: isDark ? '#f9fafb' : '#111827',
+                                            borderRadius: '12px',
+                                            textDecoration: 'none',
+                                            fontWeight: 600,
+                                            fontSize: '15px',
+                                            transition: 'all 0.2s',
+                                            border: `1px solid ${isDark ? '#4b5563' : '#d1d5db'}`,
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.backgroundColor = isDark ? '#4b5563' : '#e5e7eb';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#f3f4f6';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                        }}
+                                    >
+                                        <ExternalLink size={18} /> Open in New Tab
+                                    </a>
                                 </div>
-                                <a
-                                    href={note.file_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{
+
+                                {/* PDF Preview */}
+                                <div style={{
+                                    backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                                    borderRadius: '16px',
+                                    border: `2px solid ${isDark ? '#374151' : '#e5e7eb'}`,
+                                    overflow: 'hidden',
+                                    boxShadow: isDark
+                                        ? '0 10px 40px rgba(0,0,0,0.3)'
+                                        : '0 10px 40px rgba(0,0,0,0.1)',
+                                }}>
+                                    <div style={{
+                                        padding: '16px 20px',
+                                        backgroundColor: isDark ? '#374151' : '#f9fafb',
+                                        borderBottom: `1px solid ${isDark ? '#4b5563' : '#e5e7eb'}`,
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: '8px',
-                                        padding: '10px 20px',
-                                        backgroundColor: '#3b82f6',
-                                        color: 'white',
-                                        borderRadius: '10px',
-                                        textDecoration: 'none',
-                                        fontWeight: 500,
-                                    }}
-                                >
-                                    <Download size={18} /> Download
-                                </a>
+                                        gap: '12px',
+                                    }}>
+                                        <FileText style={{ width: '20px', height: '20px', color: '#3b82f6' }} />
+                                        <span style={{
+                                            fontWeight: 600,
+                                            color: isDark ? '#f9fafb' : '#111827',
+                                            fontSize: '15px',
+                                        }}>
+                                            PDF Preview
+                                        </span>
+                                    </div>
+                                    <iframe
+                                        src={getFileUrl(note.file_url) || ''}
+                                        style={{
+                                            width: '100%',
+                                            height: '800px',
+                                            border: 'none',
+                                            display: 'block',
+                                        }}
+                                        title="PDF Preview"
+                                    />
+                                </div>
                             </div>
                         )}
                     </div>

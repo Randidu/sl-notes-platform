@@ -14,6 +14,8 @@ interface Stats {
     total_views: number;
 }
 
+import AdminNavbar from '../../components/admin/AdminNavbar';
+
 const AdminDashboard: React.FC = () => {
     const [stats, setStats] = useState<Stats | null>(null);
     const [loading, setLoading] = useState(true);
@@ -70,14 +72,48 @@ const AdminDashboard: React.FC = () => {
     return (
         <div style={{ padding: '32px 0', minHeight: '100vh' }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px' }}>
+                <AdminNavbar />
                 {/* Header */}
-                <div style={{ marginBottom: '32px' }}>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 700, color: isDark ? '#f9fafb' : '#111827', marginBottom: '8px' }}>
-                        Admin Dashboard
-                    </h1>
-                    <p style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
-                        Welcome back, {user.full_name}. Manage your platform from here.
-                    </p>
+
+                <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <h1 style={{ fontSize: '2rem', fontWeight: 700, color: isDark ? '#f9fafb' : '#111827', marginBottom: '8px' }}>
+                            Admin Dashboard
+                        </h1>
+                        <p style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
+                            Welcome back, {user.full_name}. Manage your platform from here.
+                        </p>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <button
+                            onClick={() => navigate('/')}
+                            style={{
+                                padding: '10px 20px',
+                                backgroundColor: isDark ? '#374151' : '#f3f4f6',
+                                color: isDark ? '#d1d5db' : '#4b5563',
+                                border: 'none',
+                                borderRadius: '10px',
+                                cursor: 'pointer',
+                                fontWeight: 600,
+                            }}
+                        >
+                            Homepage
+                        </button>
+                        <button
+                            onClick={() => navigate('/subjects')}
+                            style={{
+                                padding: '10px 20px',
+                                backgroundColor: isDark ? '#374151' : '#f3f4f6',
+                                color: isDark ? '#d1d5db' : '#4b5563',
+                                border: 'none',
+                                borderRadius: '10px',
+                                cursor: 'pointer',
+                                fontWeight: 600,
+                            }}
+                        >
+                            View Subjects
+                        </button>
+                    </div>
                 </div>
 
                 {/* Stats Grid */}
@@ -119,7 +155,7 @@ const AdminDashboard: React.FC = () => {
                 <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: isDark ? '#f9fafb' : '#111827', marginBottom: '16px' }}>
                     Quick Actions
                 </h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                     {menuItems.map((item, i) => (
                         <div
                             key={i}
@@ -127,15 +163,20 @@ const AdminDashboard: React.FC = () => {
                             style={{
                                 ...cardStyle,
                                 cursor: 'pointer',
-                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                transition: 'all 0.2s ease',
+                                border: `1px solid ${isDark ? '#374151' : '#e5e7eb'}`,
                             }}
                             onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 10px 40px rgba(0,0,0,0.1)';
+                                e.currentTarget.style.transform = 'translateY(-4px)';
+                                e.currentTarget.style.boxShadow = isDark
+                                    ? '0 10px 25px -5px rgba(0, 0, 0, 0.5)'
+                                    : '0 10px 25px -5px rgba(0, 0, 0, 0.1)';
+                                e.currentTarget.style.borderColor = '#3b82f6';
                             }}
                             onMouseLeave={(e) => {
                                 e.currentTarget.style.transform = 'none';
                                 e.currentTarget.style.boxShadow = 'none';
+                                e.currentTarget.style.borderColor = isDark ? '#374151' : '#e5e7eb';
                             }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -147,14 +188,15 @@ const AdminDashboard: React.FC = () => {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
+                                    flexShrink: 0,
                                 }}>
                                     <item.icon style={{ width: '24px', height: '24px', color: 'white' }} />
                                 </div>
                                 <div>
-                                    <h3 style={{ fontWeight: 600, color: isDark ? '#f9fafb' : '#111827', marginBottom: '4px' }}>
+                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: isDark ? '#f9fafb' : '#111827', marginBottom: '4px' }}>
                                         {item.label}
                                     </h3>
-                                    <p style={{ fontSize: '13px', color: isDark ? '#9ca3af' : '#6b7280' }}>
+                                    <p style={{ fontSize: '13px', color: isDark ? '#9ca3af' : '#6b7280', margin: 0 }}>
                                         {item.desc}
                                     </p>
                                 </div>

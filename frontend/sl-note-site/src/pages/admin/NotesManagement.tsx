@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminNavbar from '../../components/admin/AdminNavbar';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, Trash2, Plus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -66,6 +67,7 @@ const NotesManagement: React.FC = () => {
     return (
         <div style={{ padding: '32px 0', minHeight: '100vh' }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px' }}>
+                <AdminNavbar />
                 <Link to="/admin" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#3b82f6', textDecoration: 'none', marginBottom: '24px', fontWeight: 500 }}>
                     <ArrowLeft size={20} /> Back to Admin Dashboard
                 </Link>

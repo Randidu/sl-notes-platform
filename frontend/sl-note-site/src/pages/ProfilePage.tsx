@@ -9,7 +9,7 @@ import type { Note } from '../types';
 const ProfilePage: React.FC = () => {
     const [userNotes, setUserNotes] = useState<Note[]>([]);
     const [loading, setLoading] = useState(true);
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, logout } = useAuth();
     const { theme } = useTheme();
     const navigate = useNavigate();
 
@@ -96,6 +96,39 @@ const ProfilePage: React.FC = () => {
                             </p>
                             <p style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>Total Views</p>
                         </div>
+                    </div>
+                    <div style={{ padding: '0 24px 24px', borderTop: `1px solid ${isDark ? '#374151' : '#e5e7eb'}` }}>
+                        <button
+                            onClick={() => {
+                                if (confirm('Are you sure you want to sign out?')) {
+                                    logout();
+                                }
+                            }}
+                            style={{
+                                width: '100%',
+                                padding: '12px 24px',
+                                backgroundColor: isDark ? '#7f1d1d' : '#fee2e2',
+                                color: isDark ? '#fca5a5' : '#dc2626',
+                                border: `1px solid ${isDark ? '#991b1b' : '#fecaca'}`,
+                                borderRadius: '10px',
+                                fontSize: '16px',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = isDark ? '#991b1b' : '#fecaca';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = isDark ? '#7f1d1d' : '#fee2e2';
+                            }}
+                        >
+                            Sign Out
+                        </button>
                     </div>
                 </div>
 

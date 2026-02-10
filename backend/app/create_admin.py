@@ -1,7 +1,3 @@
-"""
-Script to create an admin user.
-Run: python -m app.create_admin
-"""
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -37,7 +33,7 @@ def create_admin():
         admin = User(
             email=email,
             full_name=full_name,
-            password_hash=hash_password(password),
+            hashed_password=hash_password(password),
             is_verified=True,
             is_admin=True
         )
