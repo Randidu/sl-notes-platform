@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// In development, use proxy. In production, use VITE_API_URL provided by build.
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Create axios instance
