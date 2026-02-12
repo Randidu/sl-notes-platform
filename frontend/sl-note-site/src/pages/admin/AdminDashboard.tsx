@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, FileText, BookOpen, Eye, TrendingUp, Settings } from 'lucide-react';
+import { Users, FileText, BookOpen, Eye, TrendingUp } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { adminService } from '../../services/adminService';
