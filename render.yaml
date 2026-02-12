@@ -1,0 +1,35 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: sl-notes-db
+    env: docker
+    region: singapore
+    plan: free
+    ipAllowList: []  # Allow connections from anywhere (required for free tier)
+
+  # Web Service (API)
+  - type: web
+    name: sl-notes-api
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sl-notes-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 10080
+      - key: APP_NAME
+        value: SL Notes API
+      - key: DEBUG
+        value: False
+
