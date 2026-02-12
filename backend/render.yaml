@@ -1,17 +1,16 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: sl-notes-db
-    env: docker
+databases:
+  - name: sl-notes-db
+    databaseName: sl_notes
     region: singapore
     plan: free
 
-  # Web Service (API)
+services:
   - type: web
     name: sl-notes-api
     env: python
     region: singapore
     plan: free
+    rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
@@ -31,4 +30,3 @@ services:
         value: SL Notes API
       - key: DEBUG
         value: False
-
