@@ -1,21 +1,9 @@
 from sqlmodel import create_engine, SQLModel, Session
-<<<<<<< HEAD
-=======
 from sqlalchemy.pool import QueuePool
->>>>>>> origin/main
 from app.config import get_settings
 
 settings = get_settings()
 
-<<<<<<< HEAD
-# Handle database connection args (SQLite needs check_same_thread=False)
-connect_args = {"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
-
-engine = create_engine(
-    settings.DATABASE_URL, 
-    echo=settings.DEBUG,
-    connect_args=connect_args
-=======
 # Create engine with PostgreSQL-optimized settings
 connect_args = {}
 engine_kwargs = {
@@ -39,7 +27,6 @@ engine = create_engine(
     settings.DATABASE_URL,
     connect_args=connect_args,
     **engine_kwargs
->>>>>>> origin/main
 )
 
 def create_db_and_tables():

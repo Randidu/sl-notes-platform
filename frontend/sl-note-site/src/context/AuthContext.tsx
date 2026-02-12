@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { User, AuthState } from '../types';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import type { AuthState } from '../types';
 import authService from '../services/authService';
 
 interface AuthContextType extends AuthState {
@@ -21,15 +21,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Load user on mount if token exists
     useEffect(() => {
         const loadUser = async () => {
-            if (state.token) {
+            const token = localStorage.getItem('access_token');
+            if (token) {
                 try {
                     const user = await authService.getMe();
-                    setState((prev) => ({
-                        ...prev,
+                    setState({
                         user,
+                        token,
                         isAuthenticated: true,
                         isLoading: false,
-                    }));
+                    });
                 } catch {
                     // Token invalid, clear it
                     localStorage.removeItem('access_token');
@@ -46,7 +47,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
 
         loadUser();
-    }, []);
+    }, []); // Now safe - no external dependencies
 
     const login = async (email: string, password: string) => {
         const tokenData = await authService.login(email, password);

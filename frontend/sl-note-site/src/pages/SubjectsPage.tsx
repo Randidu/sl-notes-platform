@@ -1,9 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { BookOpen, GraduationCap, Search, Filter, Grid3x3, List, ArrowRight, Sparkles } from 'lucide-react';
+import { BookOpen, GraduationCap, Search, Grid3x3, List, ArrowRight, Sparkles, Calculator, Atom, Languages, Globe2, Landmark, Zap, Beaker, Microscope, TrendingUp, DollarSign } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { subjectService } from '../services/subjectService';
 import type { Subject } from '../types';
+
+// Helper function to get subject-specific icon
+const getSubjectIcon = (subjectName: string, size: number = 28) => {
+    const name = subjectName.toLowerCase();
+    const iconProps = { style: { width: `${size}px`, height: `${size}px`, color: 'white' } };
+
+    if (name.includes('math')) return <Calculator {...iconProps} />;
+    if (name.includes('physics')) return <Atom {...iconProps} />;
+    if (name.includes('chemistry')) return <Beaker {...iconProps} />;
+    if (name.includes('biology')) return <Microscope {...iconProps} />;
+    if (name.includes('science')) return <Zap {...iconProps} />;
+    if (name.includes('english') || name.includes('sinhala')) return <Languages {...iconProps} />;
+    if (name.includes('geography')) return <Globe2 {...iconProps} />;
+    if (name.includes('history')) return <Landmark {...iconProps} />;
+    if (name.includes('economics')) return <TrendingUp {...iconProps} />;
+    if (name.includes('accounting')) return <DollarSign {...iconProps} />;
+
+    // Default icons based on exam type
+    return <BookOpen {...iconProps} />;
+};
 
 const ModernSubjectsPage: React.FC = () => {
     const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -119,10 +139,7 @@ const ModernSubjectsPage: React.FC = () => {
                             ? '0 8px 24px rgba(16, 185, 129, 0.25)'
                             : '0 8px 24px rgba(139, 92, 246, 0.25)',
                     }}>
-                        {subject.exam_type === 'OL'
-                            ? <BookOpen style={{ width: '28px', height: '28px', color: 'white' }} />
-                            : <GraduationCap style={{ width: '28px', height: '28px', color: 'white' }} />
-                        }
+                        {getSubjectIcon(subject.name, 28)}
                     </div>
                     <div style={{ flex: 1 }}>
                         <h3 style={{
@@ -212,10 +229,7 @@ const ModernSubjectsPage: React.FC = () => {
                     justifyContent: 'center',
                     flexShrink: 0,
                 }}>
-                    {subject.exam_type === 'OL'
-                        ? <BookOpen style={{ width: '32px', height: '32px', color: 'white' }} />
-                        : <GraduationCap style={{ width: '32px', height: '32px', color: 'white' }} />
-                    }
+                    {getSubjectIcon(subject.name, 32)}
                 </div>
                 <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
