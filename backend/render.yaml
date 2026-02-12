@@ -1,4 +1,13 @@
 services:
+  # PostgreSQL Database
+  - type: pserv
+    name: sl-notes-db
+    env: docker
+    region: singapore
+    plan: free
+    ipAllowList: []  # Allow connections from anywhere (required for free tier)
+
+  # Web Service (API)
   - type: web
     name: sl-notes-api
     env: python
@@ -9,6 +18,10 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sl-notes-db
+          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: ALGORITHM
@@ -19,3 +32,4 @@ services:
         value: SL Notes API
       - key: DEBUG
         value: False
+
