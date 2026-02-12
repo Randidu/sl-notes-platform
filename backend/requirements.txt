@@ -15,9 +15,11 @@ pydantic-settings>=2.0.0
 
 # Email
 fastapi-mail>=1.4.0
+resend>=2.1.0
 
 # File Uploads
 python-multipart>=0.0.6
 
 # Development
 aiosqlite>=0.19.0
+psycopg2-binary>=2.9.9

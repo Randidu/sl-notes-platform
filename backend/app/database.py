@@ -1,10 +1,16 @@
 from sqlmodel import create_engine, SQLModel, Session
-import os
+from app.config import get_settings
 
-sqlite_file_name = "sl_notes.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+settings = get_settings()
 
-engine = create_engine(sqlite_url, echo=True)
+# Handle database connection args (SQLite needs check_same_thread=False)
+connect_args = {"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
+
+engine = create_engine(
+    settings.DATABASE_URL, 
+    echo=settings.DEBUG,
+    connect_args=connect_args
+)
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
