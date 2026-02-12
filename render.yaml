@@ -5,7 +5,6 @@ services:
     env: docker
     region: singapore
     plan: free
-    ipAllowList: []  # Allow connections from anywhere (required for free tier)
 
   # Web Service (API)
   - type: web
