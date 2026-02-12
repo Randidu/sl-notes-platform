@@ -5,8 +5,8 @@ from functools import lru_cache
 class Settings(BaseSettings):
     """Application configuration settings."""
     
-    # Database
-    DATABASE_URL: str = "sqlite:///./sl_notes.db"
+    # Database (PostgreSQL)
+    DATABASE_URL: str = "postgresql://postgres:password@localhost:5432/sl_notes"
     
     # JWT Settings
     SECRET_KEY: str = "your-secret-key-change-in-production-min-32-chars!"
